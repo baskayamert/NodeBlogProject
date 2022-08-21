@@ -39,11 +39,16 @@ router.get('/posts', (req, res) => {
 
     Post.find({}).populate({path:'category', model: Category}).sort({$natural:-1}).lean().then(posts => {
         
-        res.render('admin/posts', {posts:posts})
-        
-        
+        res.render('admin/posts', {posts:posts})  
     })
 
+})
+
+router.delete('/posts/:id', (req, res) => {
+
+    Post.deleteOne({ _id: req.params.id }).lean().then(categories => {
+        res.redirect('/admin/posts')
+    })
 
 })
 
