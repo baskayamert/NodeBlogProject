@@ -20,7 +20,10 @@ router.get('/new', (req, res) => {
 router.get('/:id', (req, res) => {
     Post.findById(req.params.id).populate({path:'author', model: User}).lean().then(post => { 
         Category.find({}).lean().then(categories => {
-            res.render('site/post', {post:post, categories: categories}) // You can use {post:post.toJSON()} instead of writing lean() next to findById method
+            Post.find({}).populate({path:'author', model: User}).sort({$natural:-1}).lean().then(posts => {
+                res.render('site/post', {post:post, categories: categories, posts: posts}) // You can use {post:post.toJSON()} instead of writing lean() next to findById method
+            })
+            
         })
     })
 })

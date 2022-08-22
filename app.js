@@ -7,6 +7,7 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const fileUpload = require('express-fileupload')
 const generateDate = require('./helpers/generateDate').generateDate
+const limit = require('./helpers/limit').limit
 const expressSession = require('express-session')
 const connectMongo = require('connect-mongo')
 const methodOverride = require('method-override')
@@ -43,7 +44,16 @@ app.use(methodOverride('_method'))
 //     }
 // })
 
-app.engine('handlebars', exphbs.engine({ helpers: { generateDate: generateDate } }))
+// handlebars helpers
+
+const hbs = exphbs.create({
+    helpers: {
+        generateDate: generateDate,
+        limit: limit
+    }
+})
+
+app.engine('handlebars', hbs.engine)
 app.set('view engine', 'handlebars')
 
 // parse application/x-www-form-urlencoded
