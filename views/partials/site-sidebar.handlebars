@@ -14,7 +14,7 @@
         <h3 class="mb-3">Categories</h3>
         <div class="widget-category">
             {{#each categories}}
-            <a href="#">{{name}}<span>(7)</span></a>
+            <a href="/posts/category/{{_id}}">{{name}}<span>({{num_of_posts}})</span></a>
             {{/each}}
         </div>
     </div>
@@ -28,7 +28,7 @@
 {{#each (limit posts 2)}}
 
         <div class="widget-post">
-            <a href="#">
+            <a href="/posts/{{_id}}">
                 <img class="img-fluid" src="{{post_image}}" alt="">{{title}}
             <ul class="blog-meta">
                 <li>{{generateDate date 'MMM DD YYYY'}}</li>

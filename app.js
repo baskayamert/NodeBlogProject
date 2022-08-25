@@ -6,8 +6,7 @@ const hostname = '127.0.0.1'
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const fileUpload = require('express-fileupload')
-const generateDate = require('./helpers/generateDate').generateDate
-const limit = require('./helpers/limit').limit
+const {generateDate, limit, truncate} = require('./helpers/hbs')
 const expressSession = require('express-session')
 const connectMongo = require('connect-mongo')
 const methodOverride = require('method-override')
@@ -24,12 +23,6 @@ app.use(expressSession({
     store: connectMongo.create({ mongoUrl: 'mongodb://127.0.0.1/nodeblog_db' })
 }))
 
-// Flash - Message Middleware
-app.use((req, res, next) => {
-    res.locals.sessionFlash = req.session.sessionFlash
-    delete req.session.sessionFlash
-    next()
-})
 
 app.use(fileUpload())
 
@@ -49,7 +42,8 @@ app.use(methodOverride('_method'))
 const hbs = exphbs.create({
     helpers: {
         generateDate: generateDate,
-        limit: limit
+        limit: limit,
+        truncate: truncate
     }
 })
 
@@ -74,6 +68,13 @@ app.use((req, res, next) => {
             displayLink: false
         }
     }
+    next()
+})
+
+// Flash - Message Middleware
+app.use((req, res, next) => {
+    res.locals.sessionFlash = req.session.sessionFlash
+    delete req.session.sessionFlash
     next()
 })
 

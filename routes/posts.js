@@ -17,9 +17,49 @@ router.get('/new', (req, res) => {
     
 })
 
+router.get('/category/:categoryId', (req, res) => {
+    Post.find({category: req.params.categoryId}).populate({path:'category', model: Category}).populate({path:'author', model: User}).lean().then(posts => {
+        Category.aggregate([
+            {
+                $lookup:{
+                    from: 'posts',
+                    localField: '_id',
+                    foreignField: 'category',
+                    as: 'posts'
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    num_of_posts: {$size: '$posts'}
+                }
+            }
+        ]).then(categories => {
+            res.render('site/blog', {posts: posts, categories: categories})
+        })
+    })
+})
+
 router.get('/:id', (req, res) => {
     Post.findById(req.params.id).populate({path:'author', model: User}).lean().then(post => { 
-        Category.find({}).lean().then(categories => {
+        Category.aggregate([
+            {
+                $lookup:{
+                    from: 'posts',
+                    localField: '_id',
+                    foreignField: 'category',
+                    as: 'posts'
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    num_of_posts: {$size: '$posts'}
+                }
+            }
+        ]).then(categories => {
             Post.find({}).populate({path:'author', model: User}).sort({$natural:-1}).lean().then(posts => {
                 res.render('site/post', {post:post, categories: categories, posts: posts}) // You can use {post:post.toJSON()} instead of writing lean() next to findById method
             })

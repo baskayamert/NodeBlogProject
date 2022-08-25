@@ -14,7 +14,23 @@ router.get('/', (req, res) => {
 
 router.get('/blog', (req, res) => {
     Post.find({}).populate({path:'author', model: User}).sort({$natural:-1}).lean().then(posts => {
-        Category.find({}).lean().then(categories => {
+        Category.aggregate([
+            {
+                $lookup:{
+                    from: 'posts',
+                    localField: '_id',
+                    foreignField: 'category',
+                    as: 'posts'
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    num_of_posts: {$size: '$posts'}
+                }
+            }
+        ]).then(categories => {
             res.render('site/blog', {posts:posts, categories: categories})
         })
         
